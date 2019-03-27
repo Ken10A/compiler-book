@@ -3,6 +3,16 @@
 #include <ctype.h>
 #include <string.h>
 
+enum {
+    ND_NUM = 256
+};
+
+typedef struct Node {
+    int ty;
+    struct Node lhs;
+    struct Node rhs;
+    int val;
+} Node;
 
 enum {
     TK_NUM = 256,
