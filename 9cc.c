@@ -36,6 +36,21 @@ int consume(int ty) {
     return 1;
 }
 
+Node *add() {
+    Node *node = mul();
+
+    for(;;) {
+        if(consume('+'))
+            node = new_node('+', node, mul());
+        else if (consume('-'))
+            node = new_node(('-', node, mul()));
+        else
+            return node;
+    }
+}
+
+
+
 enum {
     TK_NUM = 256,
     TK_EOF,
