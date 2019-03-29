@@ -29,6 +29,13 @@ Node *new_node_num(int val){
     return node;
 }
 
+int consume(int ty) {
+    if (tokens[pos].ty != ty)
+        return 0;
+    pos++;
+    return 1;
+}
+
 enum {
     TK_NUM = 256,
     TK_EOF,
