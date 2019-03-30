@@ -49,6 +49,18 @@ Node *add() {
     }
 }
 
+Node *mul() {
+    Node *node = term();
+
+    for(;;) {
+        if (consume('*'))
+            node = new_node('*', node, term());
+        else if (consume('/'))
+            node = new_node('/', node, term());
+        else
+            return node;
+    }
+}
 
 
 enum {
