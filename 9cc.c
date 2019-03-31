@@ -62,6 +62,21 @@ Node *mul() {
     }
 }
 
+Node *term() {
+    if(consume('(')) {
+        Node *node = add();
+        if (!consume(')'))
+            error("Not found a close curl bracket corresponding to an open curl bracket: %s",
+                  tokens[pos].input);
+        return node;
+    }
+
+    if (tokens[pos].ty == TK_NUM)
+        return new_node_num(tokens[pos++].val);
+
+    error("Found a token that is nethrer number nor an open bracket: %s",
+          tokens[pos].input);
+}
 
 enum {
     TK_NUM = 256,
