@@ -7,12 +7,37 @@ enum {
     ND_NUM = 256
 };
 
+enum {
+    TK_NUM = 256,
+    TK_EOF,
+};
+
+typedef struct {
+    int ty;
+    int val;
+    char *input;
+} Token;
+
 typedef struct Node {
     int ty;
-    struct Node lhs;
-    struct Node rhs;
+    struct Node *lhs;
+    struct Node *rhs;
     int val;
 } Node;
+
+Token tokens[100];
+
+int pos = 0;
+
+Node *new_node(int ty, Node *lhs, Node *rhs);
+Node *new_node_num(int val);
+int consume(int ty);
+Node *mul();
+Node *add();
+Node *term();
+void gen(Node *node);
+void tokenize(char *p);
+void error(char *msg, char *input);
 
 Node *new_node(int ty, Node *lhs, Node *rhs) {
     Node *node = malloc(sizeof(Node));
@@ -36,19 +61,6 @@ int consume(int ty) {
     return 1;
 }
 
-Node *add() {
-    Node *node = mul();
-
-    for(;;) {
-        if(consume('+'))
-            node = new_node('+', node, mul());
-        else if (consume('-'))
-            node = new_node('-', node, mul());
-        else
-            return node;
-    }
-}
-
 Node *mul() {
     Node *node = term();
 
@@ -62,20 +74,31 @@ Node *mul() {
     }
 }
 
+Node *add() {
+    Node *node = mul();
+
+    for(;;) {
+        if(consume('+'))
+            node = new_node('+', node, mul());
+        else if (consume('-'))
+            node = new_node('-', node, mul());
+        else
+            return node;
+    }
+}
+
 Node *term() {
     if(consume('(')) {
         Node *node = add();
         if (!consume(')'))
-            error("Not found a close curl bracket corresponding to an open curl bracket: %s",
-                  tokens[pos].input);
+            error("Not found a close curl bracket corresponding to an open curl bracket", tokens[pos].input);
         return node;
     }
 
     if (tokens[pos].ty == TK_NUM)
         return new_node_num(tokens[pos++].val);
 
-    error("Found a token that is nethrer number nor an open bracket: %s",
-          tokens[pos].input);
+    error("Found a token that is nethrer number nor an open bracket", tokens[pos].input);
 }
 
 void gen(Node *node) {
@@ -107,19 +130,6 @@ void gen(Node *node) {
 
     printf("    push rax\n");
 }
-
-enum {
-    TK_NUM = 256,
-    TK_EOF,
-};
-
-typedef struct {
-    int ty;
-    int val;
-    char *input;
-} Token;
-
-Token tokens[100];
 
 void tokenize(char *p) {
     int i = 0;
@@ -154,8 +164,8 @@ void tokenize(char *p) {
     tokens[i].input = p;
 }
 
-void error(int i) {
-    fprintf(stderr, "unexpected token %s\n", tokens[i].input);
+void error(char *msg, char *input) {
+    fprintf(stderr, "%s: %s\n", msg, input);
     exit(1);
 }
 
@@ -163,41 +173,18 @@ int main(int argc, char **argv) {
     if (argc != 2) {
         fprintf(stderr, "wrong number of argument\n");
         return 1;
-}
-
-tokenize(argv[1]);
-
-printf(".intel_syntax noprefix\n");
-printf(".global _main\n");
-printf("_main:\n");
-
-if (tokens[0].ty != TK_NUM)
-    error(0);
-printf("  mov rax, %d\n", tokens[0].val);
-
-int i = 1;
-while (tokens[i].ty != TK_EOF) {
-    if (tokens[i].ty == '+') {
-        i++;
-        if (tokens[i].ty != TK_NUM)
-            error(i);
-        printf("  add rax, %d\n", tokens[i].val);
-        i++;
-        continue;
     }
 
-    else if (tokens[i].ty == '-') {
-        i++;
-        if (tokens[i].ty != TK_NUM)
-            error(i);
-        printf("  sub rax, %d\n", tokens[i].val);
-        i++;
-        continue;
-    }
-    else
-        error(i);
-    }
+    tokenize(argv[1]);
+    Node *node = add();
 
-    printf("  ret\n");
+    printf(".intel_syntax noprefix\n");
+    printf(".global _main\n");
+    printf("_main:\n");
+
+    gen(node);
+
+    printf("    pop rax\n");
+    printf("    ret\n");
     return 0;
 }
