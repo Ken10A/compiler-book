@@ -98,7 +98,7 @@ Node *term() {
     if (tokens[pos].ty == TK_NUM)
         return new_node_num(tokens[pos++].val);
 
-    error("Found a token that is nethrer number nor an open bracket", tokens[pos].input);
+    error("Found a token that is nethrer a number nor an open bracket", tokens[pos].input);
 }
 
 void gen(Node *node) {
@@ -140,7 +140,7 @@ void tokenize(char *p) {
             continue;
         }
 
-        if (*p == '+' || *p == '-') {
+        if (*p == '+' || *p == '-' || *p == '*' || *p == '/' || *p == '(' || *p == ')') {
             tokens[i].ty = *p;
             tokens[i].input = p;
             i++;
