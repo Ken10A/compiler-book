@@ -25,6 +25,12 @@ typedef struct Node {
     int val;
 } Node;
 
+typedef struct {
+    void **data;
+    int capacity;
+    int len;
+} Vector;
+
 Token tokens[100];
 
 int pos = 0;
@@ -38,6 +44,8 @@ Node *term();
 void gen(Node *node);
 void tokenize(char *p);
 void error(char *msg, char *input);
+Vector *new_vector();
+void vec_push(Vector *vec, void *elem);
 
 Node *new_node(int ty, Node *lhs, Node *rhs) {
     Node *node = malloc(sizeof(Node));
@@ -167,6 +175,22 @@ void tokenize(char *p) {
 void error(char *msg, char *input) {
     fprintf(stderr, "%s: %s\n", msg, input);
     exit(1);
+}
+
+Vector *new_vector() {
+    Vector *vec = malloc(sizeof(Vector));
+    vec->data = malloc(sizeof(void *) * 16);
+    vec->capacity = 16;
+    vec->len = 0;
+    return vec;
+}
+
+void vec_push(Vector *vec, void *elem) {
+    if (vec->capacity == vec->len) {
+        vec->capacity *= 2;
+        vec->data = realloc(vec->data, sizeof(void *) * vec->capacity);
+    }
+    vec->data[vec->len++] = elem;
 }
 
 int main(int argc, char **argv) {
