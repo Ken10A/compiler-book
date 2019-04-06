@@ -46,6 +46,8 @@ void tokenize(char *p);
 void error(char *msg, char *input);
 Vector *new_vector();
 void vec_push(Vector *vec, void *elem);
+int expect(int line, int expected, int actual);
+void runtest();
 
 Node *new_node(int ty, Node *lhs, Node *rhs) {
     Node *node = malloc(sizeof(Node));
@@ -193,22 +195,48 @@ void vec_push(Vector *vec, void *elem) {
     vec->data[vec->len++] = elem;
 }
 
+int expect(int line, int expected, int actual) {
+    if (expected == actual)
+        return 0;
+    fprintf(stderr, "%d: %d expected, but got %d\n", line, expected, actual);
+    exit(1);
+}
+
+void runtest() {
+    Vector *vec = new_vector();
+    expect(__LINE__, 0, vec->len);
+
+    for (int i = 0; i < 100; i++)
+        vec_push(vec, (void *)i);
+
+    expect(__LINE__, 100, vec->len);
+    expect(__LINE__, 0, (int)vec->data[0]);
+    expect(__LINE__, 50, (int)vec->data[50]);
+    expect(__LINE__, 99, (int)vec->data[99]);
+
+    printf("OK\n");
+}
+
 int main(int argc, char **argv) {
     if (argc != 2) {
         fprintf(stderr, "wrong number of argument\n");
         return 1;
     }
 
-    tokenize(argv[1]);
-    Node *node = add();
+    if (strcmp(argv[1], "-test") == 0)
+        runtest();
+    else {
+        tokenize(argv[1]);
+        Node *node = add();
 
-    printf(".intel_syntax noprefix\n");
-    printf(".global _main\n");
-    printf("_main:\n");
+        printf(".intel_syntax noprefix\n");
+        printf(".global _main\n");
+        printf("_main:\n");
 
-    gen(node);
+        gen(node);
 
-    printf("    pop rax\n");
-    printf("    ret\n");
-    return 0;
+        printf("    pop rax\n");
+        printf("    ret\n");
+        return 0;
+    }
 }
