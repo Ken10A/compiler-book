@@ -36,18 +36,38 @@ Token tokens[100];
 
 int pos = 0;
 
+Node *code[100];
+
 Node *new_node(int ty, Node *lhs, Node *rhs);
+
 Node *new_node_num(int val);
+
 int consume(int ty);
+
 Node *mul();
+
 Node *add();
+
 Node *term();
+
 void gen(Node *node);
+
 void tokenize(char *p);
+
 void error(char *msg, char *input);
+
 Vector *new_vector();
+
 void vec_push(Vector *vec, void *elem);
+
+Node *assign();
+
+Node *stmt();
+
+void program();
+
 int expect(int line, int expected, int actual);
+
 void runtest();
 
 Node *new_node(int ty, Node *lhs, Node *rhs) {
@@ -202,6 +222,27 @@ void vec_push(Vector *vec, void *elem) {
         vec->data = realloc(vec->data, sizeof(void *) * vec->capacity);
     }
     vec->data[vec->len++] = elem;
+}
+
+Node *assign() {
+    Node *node = add();
+    while (consume('='))
+        node = new_node('=', node, assign());
+    return node;
+}
+
+Node *stmt() {
+    Node *node = assign(){
+    if (!consume(';'))
+        error("Found not ';' token: %s", tokens[pos].input);
+    }
+}
+
+void program() {
+    int i = 0;
+    while (tokens[pos].ty != TK_EOF)
+        code[i++] = stmt();
+    code[i] = NULL;
 }
 
 int expect(int line, int expected, int actual) {
