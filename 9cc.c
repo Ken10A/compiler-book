@@ -313,15 +313,23 @@ int main(int argc, char **argv) {
         runtest();
     else {
         tokenize(argv[1]);
-        Node *node = add();
+        program();
 
         printf(".intel_syntax noprefix\n");
         printf(".global _main\n");
         printf("_main:\n");
 
-        gen(node);
+        printf("    push rbp\n");
+        printf("    mov rbp, rsp\n");
+        printf("    sub rsp, 208\n");
 
-        printf("    pop rax\n");
+        for (int i = 0; code[i]; i++) {
+            gen(code[i]);
+            printf("    pop rax\n");
+        }
+
+        printf("    mov rsp, rbp\n");
+        printf("    pop rbp\n");
         printf("    ret\n");
         return 0;
     }
