@@ -4,7 +4,7 @@
 #include <string.h>
 
 enum {
-    ND_NUM = 256
+    ND_NUM = 256,
     ND_IDENT,
 };
 
@@ -140,7 +140,7 @@ void gen_lval(Node *node) {
 
     int offset = ('z' - node->name + 1) * 8;
     printf("    mov rax, rbp\n");
-    printf("    sub rax, %d\n");
+    printf("    sub rax, %d\n", offset);
     printf("    push rax\n");
 }
 
@@ -268,10 +268,9 @@ Node *assign() {
 }
 
 Node *stmt() {
-    Node *node = assign(){
+    Node *node = assign();
     if (!consume(';'))
         error("Found not ';' token %s", tokens[pos].input);
-    }
 }
 
 void program() {
