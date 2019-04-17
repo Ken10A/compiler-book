@@ -34,11 +34,11 @@ typedef struct {
     Vector *vals;
 } Map;
 
-extern Token tokens[100];
-
 extern int pos;
 
 extern Node *code[100];
+
+extern Token tokens[100];
 
 void error(char *msg, char *input);
 

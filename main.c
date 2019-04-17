@@ -4,13 +4,6 @@
 #include <ctype.h>
 #include <string.h>
 
-int pos = 0;
-
-void error(char *msg, char *input) {
-    fprintf(stderr, "%s: %s\n", msg, input);
-    exit(1);
-}
-
 int main(int argc, char **argv) {
     if (argc != 2) {
         fprintf(stderr, "wrong number of argument\n");

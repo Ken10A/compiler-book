@@ -15,6 +15,7 @@ Node *stmt() {
     Node *node = assign();
     if (!consume(';'))
         error("Found not ';' token %s", tokens[pos].input);
+    return node;
 }
 
 void program() {
