@@ -1,6 +1,7 @@
 enum {
     ND_NUM = 256,
     ND_IDENT,
+    ND_RETURN,
 };
 
 enum {
