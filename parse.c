@@ -11,6 +11,13 @@ int is_alnum(char c) {
            (c == '_');
 }
 
+Node *unary() {
+    if (consume('+'))
+        return term();
+    if (consume('-'))
+        return new_node('-', new_node_num(0), term());
+    return term();
+}
 
 Node *assign() {
     Node *node = add();
